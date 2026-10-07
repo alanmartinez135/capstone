@@ -1,0 +1,294 @@
+# Grupo de Estudio Duoc UC
+
+Aplicación multiplataforma (móvil y web) para apoyar el aprendizaje del inglés entre estudiantes de Duoc UC. Permite conocer el nivel de inglés mediante una evaluación diagnóstica, formar grupos de estudio por nivel, resolver tests semanales y coordinar encuentros de estudio. Proyecto APT (Capstone).
+
+Estado: MVP terminado (Fase 2). La app está conectada a una API propia con PostgreSQL y todo el sistema se ejecuta en local con Docker Compose. El chat y la recuperación de contraseña por correo quedan como trabajo futuro.
+
+## Contenido
+
+- [Funcionalidades](#funcionalidades)
+- [Estructura del repositorio](#estructura-del-repositorio)
+- [Requisitos](#requisitos)
+- [Cómo ejecutar el proyecto](#cómo-ejecutar-el-proyecto)
+- [Cuentas de prueba](#cuentas-de-prueba)
+- [Frontend (apps/mobile)](#frontend-appsmobile)
+- [Backend y comunicación cliente-servidor](#backend-y-comunicación-cliente-servidor)
+- [Documentación](#documentación)
+- [Estado del proyecto](#estado-del-proyecto)
+- [Equipo](#equipo)
+
+## Funcionalidades
+
+**Estudiante**
+
+- Registro e inicio de sesión con correo institucional `@duocuc.cl`.
+- Evaluación diagnóstica de lectura y escritura calificada en el servidor: asigna el nivel (A1–C2) y entrega fortalezas, aspectos a reforzar y recomendaciones.
+- Grupos de estudio (máximo 6 integrantes): crear, unirse desde el listado o con código de invitación, ver integrantes y abandonar.
+- Tests semanales según el nivel de sus grupos.
+- Encuentros de estudio: proponer (presencial u online), confirmar asistencia y ver los próximos en el inicio.
+- Comunidad: lista de contactos y chat (interfaz con datos simulados; trabajo futuro).
+- Ajustes: modo claro/oscuro, idioma (Español/English), cerrar sesión y eliminar cuenta.
+
+**Administrador**
+
+- Gestión de usuarios: búsqueda, filtro por rol, cambio de rol y eliminación.
+- Gestión de evaluaciones: listado con número de respuestas, creación de tests semanales de selección múltiple (nivel, habilidad, preguntas y alternativa correcta), publicación y eliminación.
+
+## Estructura del repositorio
+
+Monorepo gestionado con [Turborepo](https://turborepo.dev/) y pnpm.
+
+```
+grupo-de-estudio/
+├── apps/
+│   ├── api/             # API REST (Fastify + PostgreSQL). Backend del proyecto.
+│   │   ├── db/          # Esquema SQL y script que crea la base de pruebas
+│   │   ├── perf/        # Prueba de carga con k6
+│   │   ├── src/         # Código por módulo: auth, users, groups, evaluations, meetings, admin
+│   │   └── test/        # Pruebas automatizadas (Vitest)
+│   └── mobile/          # App Expo (React Native + web). Frontend del proyecto.
+├── docs/diagramas/      # Diagrama entidad-relación y de componentes (Mermaid y PNG)
+├── docker-compose.yml   # Base de datos, API y app web
+└── packages/
+    ├── types/           # Contrato compartido (Zod): auth, usuarios, grupos, evaluaciones, encuentros, admin y errores
+    ├── api/             # Cliente HTTP que usa la app: tokens, renovación y errores
+    ├── core/            # (stub) lógica compartida, sin uso por ahora
+    └── i18n/            # (stub) internacionalización con i18next, sin uso por ahora
+```
+
+## Requisitos
+
+- Node.js 24 o superior (`engines` del `package.json` raíz).
+- pnpm 11 (`packageManager` del `package.json` raíz).
+- Para ver la app en un teléfono: la aplicación Expo Go, o un emulador Android/iOS.
+
+## Cómo ejecutar el proyecto
+
+La forma más rápida de ver todo funcionando es [Todo en Docker](#todo-en-docker-base-api-y-app-web). Para desarrollar, primero levanta el backend ([Cómo levantar el backend](#cómo-levantar-el-backend)) y luego, desde la raíz del repositorio:
+
+```sh
+# 1. Instalar dependencias de todo el monorepo
+pnpm install
+
+# 2. Variables de la app (una sola vez): apunta a la API
+copy apps\mobile\.env.example apps\mobile\.env   # Windows (en macOS/Linux: cp)
+
+# 3. Iniciar la app (elige una opción)
+pnpm --filter mobile start      # menú de Expo: escanear QR, abrir en emulador o en web
+pnpm --filter mobile web        # abrir directamente en el navegador
+pnpm --filter mobile android    # emulador Android
+pnpm --filter mobile ios        # simulador iOS (solo macOS)
+```
+
+Otros comandos de la raíz: `pnpm lint`, `pnpm check-types`, `pnpm format`.
+
+## Cuentas de prueba
+
+El inicio de sesión y el registro usan la API real, así que las cuentas viven en PostgreSQL:
+
+- **Estudiante:** crea una desde la pantalla de registro (correo `@duocuc.cl`, contraseña de al menos 8 caracteres).
+- **Administrador:** define `SEED_ADMIN_CORREO` y `SEED_ADMIN_PASSWORD` en `apps/api/.env` y ejecuta `pnpm --filter api db:seed`.
+
+Un administrador ve un botón flotante dorado (**⇄**) para alternar entre su panel y la vista de alumno. Los estudiantes no lo ven y no pueden abrir las pantallas de administración; de todos modos, la API valida el rol real en cada solicitud.
+
+## Frontend (apps/mobile)
+
+### Tecnologías
+
+| Área                 | Herramienta                                                      |
+| -------------------- | ---------------------------------------------------------------- |
+| Framework            | Expo SDK 57, React Native 0.86, React 19                         |
+| Navegación           | Expo Router (rutas basadas en archivos, rutas tipadas)           |
+| Estilos              | NativeWind 4 (Tailwind CSS 3), modo oscuro con clase `dark:`      |
+| Estado global        | Zustand                                                          |
+| Validación y tipos   | TypeScript y Zod (paquete `@grupo-estudio/types`)                |
+| Datos remotos        | Cliente propio `@grupo-estudio/api` llamado desde el store        |
+| Internacionalización | Diccionario liviano propio (`lib/i18n.ts`)                       |
+
+### Organización de carpetas
+
+```
+apps/mobile/
+├── app/                  # Pantallas y rutas (Expo Router)
+│   ├── _layout.tsx       # Layout raíz: fuentes, tema y restauración de la sesión
+│   ├── (auth)/           # login, register, forgot-password, reset-password
+│   ├── (student)/        # dashboard, diagnostic-test, groups, weekly-tests, chat, settings
+│   └── (admin)/          # users, tests (listado y creación)
+├── components/
+│   ├── ui/               # Componentes base: Button, Card, Input, Modal, Badge, Avatar, ProgressBar, Screen
+│   ├── AppHeader.tsx     # Encabezado con navegación por rol y botón de tema
+│   ├── AuthShell.tsx     # Contenedor de las pantallas de autenticación
+│   ├── MeetingsTab.tsx   # Encuentros del grupo: proponer y confirmar asistencia
+│   └── RoleSwitcher.tsx  # Botón del administrador para alternar con la vista de alumno
+├── store/useAppStore.ts  # Estado global (Zustand)
+├── data/mockData.ts      # Datos ficticios del chat, contactos y recuperación de contraseña (trabajo futuro)
+├── lib/api.ts            # Cliente de API configurado con EXPO_PUBLIC_API_URL
+├── lib/session.ts        # Guarda los tokens (secure-store en móvil, memoria en web)
+├── lib/i18n.ts           # Textos Español/English
+├── tailwind.config.js    # Paleta institucional y configuración de NativeWind
+└── app.json              # Configuración de Expo
+```
+
+### Navegación
+
+Las carpetas entre paréntesis son *grupos de rutas*: organizan las pantallas por rol sin afectar la URL, y cada una tiene su propio `_layout.tsx`. Los layouts `(student)` y `(admin)` redirigen a `/(auth)/login` si no hay sesión iniciada, y `(admin)` envía al inicio del estudiante a quien no es administrador.
+
+| Grupo       | Ruta                          | Pantalla                                  |
+| ----------- | ----------------------------- | ----------------------------------------- |
+| `(auth)`    | `/login`                      | Inicio de sesión                          |
+| `(auth)`    | `/register`                   | Registro                                  |
+| `(auth)`    | `/forgot-password`            | Solicitud de recuperación de contraseña   |
+| `(auth)`    | `/reset-password`             | Nueva contraseña                          |
+| `(student)` | `/dashboard`                  | Inicio del estudiante                     |
+| `(student)` | `/diagnostic-test`            | Evaluación diagnóstica                    |
+| `(student)` | `/diagnostic-test/result`     | Resultados del diagnóstico                |
+| `(student)` | `/groups`                     | Listado de grupos                         |
+| `(student)` | `/groups/[groupId]`           | Detalle de grupo                          |
+| `(student)` | `/weekly-tests/[testId]`      | Test semanal                              |
+| `(student)` | `/chat`                       | Comunidad                                 |
+| `(student)` | `/chat/[friendId]`            | Conversación                              |
+| `(student)` | `/settings`                   | Ajustes                                   |
+| `(admin)`   | `/users`                      | Gestión de usuarios                       |
+| `(admin)`   | `/tests`                      | Listado de evaluaciones                   |
+| `(admin)`   | `/tests/new`                  | Crear evaluación                          |
+
+### Diseño y componentes
+
+- La paleta (azul marino `navy`, dorado `gold`, y colores `surface` e `ink` para fondos y texto) está definida en `tailwind.config.js`.
+- Los componentes de `components/ui` encapsulan el estilo; las pantallas los componen en lugar de repetir clases.
+- El tema claro/oscuro se guarda en el store de Zustand y se sincroniza con NativeWind en `app/_layout.tsx`.
+
+### Estado y datos
+
+El estado compartido (sesión, grupos, diagnóstico, tests) vive en `store/useAppStore.ts` y se carga desde la API. Las acciones que pueden fallar devuelven `{ ok, message }` con el mensaje del servidor. Las pantallas de administración consultan la API directamente. Solo la comunidad (chat y contactos) y la recuperación de contraseña siguen usando datos de `data/mockData.ts`.
+
+## Backend y comunicación cliente-servidor
+
+La API vive en `apps/api`: Node.js con TypeScript y Fastify, base de datos PostgreSQL 16 y despliegue con Docker Compose. Valida las entradas con los mismos esquemas Zod de `packages/types` que usa la app.
+
+### Cómo levantar el backend
+
+Requisitos: Docker Desktop y pnpm.
+
+```sh
+# 1. Variables de entorno (una sola vez)
+copy apps\api\.env.example apps\api\.env      # Windows (en macOS/Linux: cp)
+
+# 2. Base de datos en Docker
+docker compose up -d db
+
+# 3. Dependencias y API en modo desarrollo (aplica el esquema al iniciar)
+pnpm install
+pnpm --filter api dev                          # http://localhost:3000/health
+
+# Opcional: cuenta de administrador (define SEED_ADMIN_PASSWORD en apps/api/.env)
+pnpm --filter api db:seed
+
+# Pruebas automatizadas (requieren la base de Docker)
+pnpm --filter api test
+```
+
+### Todo en Docker (base, API y app web)
+
+El proyecto se ejecuta en local; no hay despliegue en la nube. Con Docker Desktop abierto y sin `pnpm dev` ni Expo corriendo (usan los mismos puertos):
+
+```sh
+docker compose up -d --build
+```
+
+- App web: http://localhost:8081 (build estático de Expo servido con nginx).
+- API: http://localhost:3000/health
+- La base queda expuesta en el puerto 5432, así que el administrador se crea igual que en desarrollo: `pnpm --filter api db:seed`.
+
+Para abrir la app desde otro equipo de la red, define `EXPO_PUBLIC_API_URL=http://<IP-del-PC>:3000` y `CORS_ORIGIN=http://<IP-del-PC>:8081` antes del `docker compose up -d --build` (ver comentarios en `docker-compose.yml`).
+
+### Pruebas de carga (k6)
+
+`apps/api/perf/carga.js` crea 100 estudiantes en grupos de 6, simula usuarios concurrentes que consultan su sesión, grupos, tests y encuentros, y un inicio de sesión por segundo. Exige p95 menor a 500 ms y menos de 1 % de errores (RNF-B01 y RNF-B03). Con la API corriendo en el puerto 3000:
+
+```sh
+docker run --rm -i -e BASE_URL=http://host.docker.internal:3000 grafana/k6 run - < apps/api/perf/carga.js
+```
+
+Variables opcionales: `USUARIOS` (cuentas creadas y usuarios simultáneos, por defecto 100) y `DURACION` (por ejemplo `10m` para la medición formal). Al terminar, el script elimina las cuentas que creó. En PowerShell, `<` no funciona: usa `Get-Content apps/api/perf/carga.js | docker run --rm -i -e BASE_URL=http://host.docker.internal:3000 grafana/k6 run -`.
+
+### Endpoints disponibles
+
+Todas las rutas usan el prefijo `/api/v1`. Los errores responden siempre con `{ "error": { "codigo", "mensaje" } }`.
+
+| Método | Ruta              | Acceso        | Descripción                                          |
+| ------ | ----------------- | ------------- | ---------------------------------------------------- |
+| POST   | `/auth/registro`  | Público       | Crea un estudiante (correo `@duocuc.cl`) y entrega tokens |
+| POST   | `/auth/login`     | Público       | Inicia sesión; máximo 5 intentos por minuto          |
+| POST   | `/auth/renovar`   | Público       | Entrega tokens nuevos a partir del token de renovación |
+| GET    | `/usuarios/me`    | Con sesión    | Datos del usuario de la sesión                       |
+| DELETE | `/usuarios/me`    | Con sesión    | Elimina la cuenta y sus datos                        |
+| GET    | `/usuarios`       | Administrador | Lista y filtra usuarios (`?q=` y `?rol=`)             |
+| PATCH  | `/usuarios/:id/rol` | Administrador | Cambia el rol de otra cuenta (no la propia)       |
+| DELETE | `/usuarios/:id`   | Administrador | Elimina otra cuenta y sus datos                      |
+| GET    | `/grupos`         | Con sesión    | Lista los grupos con sus integrantes                 |
+| POST   | `/grupos`         | Con sesión    | Crea un grupo (código `DUOC-####`); el creador queda como integrante |
+| GET    | `/grupos/:id`     | Con sesión    | Detalle de un grupo                                  |
+| POST   | `/grupos/unirse`  | Con sesión    | Unirse con el código de invitación                   |
+| POST   | `/grupos/:id/integrantes` | Con sesión | Unirse desde el listado (máximo 6 integrantes)   |
+| DELETE | `/grupos/:id/integrantes/me` | Con sesión | Abandonar el grupo; si queda vacío, se elimina |
+| GET    | `/diagnostico`    | Con sesión    | Preguntas de la evaluación diagnóstica (sin respuestas correctas) |
+| POST   | `/diagnostico/respuestas` | Con sesión | Califica en el servidor, guarda el resultado y asigna el nivel A1–C2 |
+| GET    | `/diagnostico/resultado`  | Con sesión | Resultado del diagnóstico del estudiante          |
+| GET    | `/tests`          | Con sesión    | Tests semanales del nivel de mis grupos, con su estado |
+| GET    | `/tests/:id`      | Con sesión    | Test con sus preguntas (sin respuestas correctas)    |
+| POST   | `/tests/:id/respuestas` | Con sesión | Califica el test en el servidor                  |
+| GET    | `/grupos/:id/encuentros` | Integrante | Encuentros vigentes del grupo, con asistentes  |
+| POST   | `/grupos/:id/encuentros` | Integrante | Proponer un encuentro (presencial u online)    |
+| PUT    | `/encuentros/:id/asistencia` | Integrante | Confirmar o rechazar asistencia            |
+| DELETE | `/encuentros/:id` | Quien lo propuso | Cancelar el encuentro                         |
+| GET    | `/encuentros/proximos` | Con sesión | Próximos encuentros de todos mis grupos         |
+| GET    | `/admin/evaluaciones` | Administrador | Todas las evaluaciones, incluidos borradores, con preguntas y respuestas |
+| POST   | `/admin/evaluaciones` | Administrador | Crea un test semanal de selección múltiple (queda como borrador) |
+| PATCH  | `/admin/evaluaciones/:id` | Administrador | Publica o vuelve a borrador; al publicar, el plazo es de una semana |
+| DELETE | `/admin/evaluaciones/:id` | Administrador | Elimina un test y sus resultados (la diagnóstica está protegida) |
+| GET    | `/health`         | Público       | Estado de la API y de la base (sin prefijo)          |
+
+### Seguridad
+
+- Contraseñas con hash Argon2id; la base nunca guarda el texto plano.
+- Token de acceso JWT de 15 minutos y token de renovación de 7 días.
+- El rol se verifica en el servidor en cada ruta de administración.
+- El login responde igual si el correo no existe o si la contraseña es incorrecta, para no revelar qué cuentas existen.
+- Las respuestas correctas nunca salen del servidor: el diagnóstico y los tests se califican en la API.
+- El cupo de 6 integrantes se controla en una transacción que bloquea el grupo (`SELECT … FOR UPDATE`): aunque varias personas intenten unirse a la vez, nadie supera el límite.
+
+### Modelo de datos
+
+El esquema está en `apps/api/db/schema.sql`: `usuarios`, `grupos`, `grupo_integrantes`, `evaluaciones`, `preguntas`, `resultados`, `encuentros` y `asistencias`. Al iniciar con una base sin evaluaciones, la API carga el contenido inicial de `apps/api/src/content/evaluaciones.ts` (si ya hay evaluaciones no lo vuelve a cargar, para respetar lo que el administrador haya eliminado): un diagnóstico de 12 preguntas (reading y writing, por competencia) y tests semanales de A1 a C1. Cada test semanal tiene un nivel y lo ven los integrantes de los grupos de ese nivel. Los mensajes del chat quedan como trabajo futuro.
+
+La escala de puntaje a nivel (0–29 % A1, 30–49 % A2, 50–69 % B1, 70–84 % B2, 85–94 % C1, 95–100 % C2) es provisoria y está en `apps/api/src/evaluations/scoring.ts`. Las rúbricas de writing y speaking de la coordinación de inglés quedan como referencia para una futura evaluación de respuesta abierta.
+
+### Conexión de la app con la API
+
+`packages/api` es el cliente HTTP que usa la app: adjunta el token, lo renueva cuando vence y entrega los errores con su mensaje. Hoy están conectados el **registro, el inicio de sesión, el cierre de sesión, la eliminación de cuenta, los grupos de estudio, la evaluación diagnóstica, los tests semanales, la coordinación de encuentros y el panel de administración**; la comunidad (chat) sigue con datos simulados.
+
+```sh
+copy apps\mobile\.env.example apps\mobile\.env   # Windows (en macOS/Linux: cp)
+```
+
+En `apps/mobile/.env`, `EXPO_PUBLIC_API_URL` apunta a `http://localhost:3000` para la versión web. Para probar en un teléfono con Expo Go, usa la IP del computador en la misma red WiFi (la API la muestra al iniciar) y reinicia Expo. En el teléfono la sesión se guarda cifrada con `expo-secure-store`; en web queda solo en memoria.
+
+### Pendiente
+
+Trabajo futuro: chat entre estudiantes, recuperación de contraseña por correo, evaluación de respuesta abierta según las rúbricas de la coordinación de inglés y despliegue en la nube con HTTPS (el proyecto académico se ejecuta en local).
+
+## Documentación
+
+- `docs/diagramas/`: [modelo entidad-relación](docs/diagramas/modelo-er.md) y [diagrama de componentes v2](docs/diagramas/componentes.md), en Mermaid (GitHub los dibuja al abrirlos), más su versión en imagen `.png`.
+- Anexo técnico, plan de pruebas, Product Vision, Definition of Done y manual técnico: repositorio de documentación del equipo ([alanmartinez135/capstone](https://github.com/alanmartinez135/capstone)), carpeta Fase 2.
+
+## Estado del proyecto
+
+- Hecho: interfaz de 16 pantallas; API Fastify con PostgreSQL; autenticación con JWT y Argon2id; grupos, diagnóstico, tests semanales, encuentros y administración conectados; pruebas automatizadas (Vitest) y de carga (k6); ejecución completa con Docker Compose.
+- Pendiente: chat, recuperación de contraseña por correo y traducción completa del idioma.
+
+## Equipo
+
+- Alan Martínez: arquitectura y backend.
+- Javiera Acuña: frontend.
