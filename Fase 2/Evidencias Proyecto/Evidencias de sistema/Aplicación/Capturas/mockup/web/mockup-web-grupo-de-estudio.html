@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Grupo de Estudio Duoc UC – Versión web</title>
+<style>
+:root{--bg:#F7F8FA;--card:#fff;--ink:#14213D;--mut:#5B6B85;--navy:#0B2A4A;--navy2:#0F3A63;--gold:#FFC72C;--line:#E3E8F0;--ok:#1E8A52;--chip:#EAF0F6;--chipt:#0F3A63;--acc:#0B2A4A;color-scheme:light;box-sizing:border-box}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1930;--card:#152341;--ink:#F2F4F8;--mut:#9AA8C2;--line:#223458;--chip:#223458;--chipt:#CFDDEA;--ok:#4CC28A;--acc:#FFC72C;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1930;--card:#152341;--ink:#F2F4F8;--mut:#9AA8C2;--line:#223458;--chip:#223458;--chipt:#CFDDEA;--ok:#4CC28A;--acc:#FFC72C;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;min-height:100vh;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--navy);color:#fff;padding:12px max(20px,calc((100% - 1080px)/2));padding-top:calc(12px + env(safe-area-inset-top,0px));display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.logo{width:36px;height:36px;border-radius:50%;background:var(--gold);color:#081F38;font-weight:800;font-size:13px;display:grid;place-items:center}
+.brand{display:flex;align-items:center;gap:10px;font-weight:700;font-size:16px}
+.pills{display:flex;gap:8px;flex-wrap:wrap;flex:1}
+.pills button{border:0;border-radius:99px;padding:8px 16px;background:var(--navy2);color:#fff;font:600 14px inherit;font-family:inherit;cursor:pointer}
+.pills button.on{background:var(--gold);color:#081F38}
+.tools{display:flex;gap:10px;align-items:center}
+.tools .ic{width:36px;height:36px;border-radius:50%;border:0;background:var(--navy2);color:#fff;font-size:16px;cursor:pointer}
+.av{width:36px;height:36px;border-radius:50%;display:grid;place-items:center;color:#fff;font-weight:700;font-size:13px;flex:none;border:0}
+main{max-width:1080px;margin:0 auto;padding:28px 20px 60px;padding-bottom:calc(60px + env(safe-area-inset-bottom,0px))}
+h1{font-size:28px;margin:0 0 4px}h2{font-size:18px;margin:26px 0 12px}
+.sub{color:var(--mut);margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:18px;margin-bottom:14px}
+.hero{background:var(--navy);color:#fff;border-color:var(--navy)}.hero .sub{color:#CFDDEA;margin:0}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}.grid .card{margin:0}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:8px}.stats .card{margin:0}
+.stats b{display:block;font-size:34px;color:var(--acc);line-height:1.1}.stats span{color:var(--mut);font-size:13px}
+.cols{display:grid;grid-template-columns:1.6fr 1fr;gap:28px;align-items:start}
+.split{display:grid;grid-template-columns:300px 1fr;gap:16px;min-height:480px}
+.split .list .card{padding:12px;margin-bottom:8px;cursor:pointer}.split .list .card.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+.thread{display:flex;flex-direction:column;margin:0}
+.msgs{flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:300px;margin-bottom:12px}
+.bub{max-width:70%;padding:9px 14px;border-radius:16px;background:var(--chip);color:var(--ink)}
+.bub.me{align-self:flex-end;background:var(--navy);color:#fff}
+@media(max-width:800px){.cols,.split{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.bub{max-width:90%}}
+.row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.row>div{min-width:0}
+.c{align-items:center}
+.t{font-weight:600}.m{color:var(--mut);font-size:13px}
+.badge{display:inline-block;padding:2px 10px;border-radius:99px;font-size:12px;font-weight:600;background:var(--chip);color:var(--chipt);white-space:nowrap}
+.badge.g{background:var(--gold);color:#3a2a00}.badge.ok{background:#DDF3E7;color:#146B3E}
+.btn{border:0;border-radius:12px;padding:10px 16px;font:600 14px "Segoe UI",system-ui,sans-serif;background:var(--navy);color:#fff;cursor:pointer}
+.btn.gold{background:var(--gold);color:#3a2a00}.btn.out{background:none;border:1.5px solid var(--acc);color:var(--acc)}
+.btn.sm{padding:6px 12px;font-size:13px}.btn.full{width:100%}
+:root[data-theme="dark"] .btn:not(.out):not(.gold){background:#2E5B8A}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]) .btn:not(.out):not(.gold){background:#2E5B8A}}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+input,select{width:100%;padding:11px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
+label{display:block;font-weight:600;font-size:13px;margin:12px 0 4px}
+.bar{height:8px;border-radius:9px;background:var(--chip);overflow:hidden;margin:4px 0 12px}.bar i{display:block;height:100%;background:var(--acc)}.bar.w i{background:var(--gold)}
+.opt{display:block;width:100%;text-align:left;margin-bottom:10px;padding:14px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
+.opt.sel{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
+.back{background:none;border:0;color:var(--mut);font:600 14px inherit;font-family:inherit;cursor:pointer;padding:0 0 12px}
+.avs{display:flex;gap:6px;margin-top:10px;align-items:center}
+.login{min-height:100vh;display:grid;place-items:center;background:var(--navy);padding:20px}
+.login .card{width:100%;max-width:400px;padding:28px}
+.toast{position:fixed;left:50%;bottom:calc(24px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:99px;font-size:14px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:9;border:1px solid var(--gold)}
+</style>
+</head>
+<body>
+<div id="app"></div><div id="toast"></div>
+<script>
+const $=s=>document.querySelector(s);
+const COL=['#0B2A4A','#2E5B8A','#C98F00','#5B6B85','#0F3A63','#1E8A52'];
+const ini=n=>n.split(' ').map(x=>x[0]).slice(0,2).join('');
+const av=(n,s=36)=>`<span class="av" style="background:${COL[n.length%6]};width:${s}px;height:${s}px">${ini(n)}</span>`;
+const ME='Javiera Acuña';
+const groups=[
+ {id:'g1',n:'Reading Warriors',l:'B1',d:'Practicamos skimming, scanning y lectura académica para los tests semanales.',m:[ME,'Sebastián Navarro','Camila Reyes','Matías Soto'],code:'DUOC-4821'},
+ {id:'g2',n:'Writing Lab',l:'B1',d:'Revisamos párrafos y emails en inglés entre todos. Feedback honesto y amable.',m:['Eduardo Guzmán',ME,'Camila Reyes'],code:'DUOC-7305'},
+ {id:'g3',n:'Basic Talk A2',l:'A2',d:'Vocabulario cotidiano y gramática básica, sin presión.',m:['Victoria Roa',ME,'Tomás Vera'],code:'DUOC-1190'},
+ {id:'g4',n:'Advanced Debaters',l:'B2',d:'Lectura de papers y debates semanales en inglés.',m:['Fernanda Lagos','Daniela Mora','Sebastián Navarro'],code:'DUOC-6642'},
+ {id:'g5',n:'Tech English Crew',l:'B1',d:'Inglés técnico para TI: documentación y entrevistas.',m:['Matías Soto','Eduardo Guzmán'],code:'DUOC-9057'}];
+const mine=new Set(['g1','g2','g3']);
+const meets=[
+ {id:'m1',g:'g1',t:'Repaso Skimming & Scanning antes del test',w:'Mañana · 18:00',loc:'Biblioteca, Sede Maipú – Sala 2',r:null},
+ {id:'m2',g:'g2',t:'Peer review: emails formales en inglés',w:'Jueves · 19:30',loc:'Online · Google Meet',r:null},
+ {id:'m3',g:'g3',t:'Role-play: pedir comida y direcciones',w:'Sábado · 17:00',loc:'Sala 204, Sede Maipú',r:'yes'},
+ {id:'m4',g:'g1',t:'Simulacro de Academic Reading',w:'Próxima semana · 18:30',loc:'Online · Zoom',r:'yes'},
+ {id:'m5',g:'g4',t:'Debate: AI in education',w:'Viernes · 18:00',loc:'Online · Zoom',r:null}];
+const tests=[
+ {id:'t1',t:'Everyday Vocabulary',s:'Reading',l:'A2',due:'vencido',sc:83,q:[['Choose the correct word: “I need to ___ my homework.”',['finish','finished','finishing','finishes'],0],['Opposite of “cheap”?',['Small','Expensive','Quick','Old'],1]]},
+ {id:'t2',t:'Present Simple & Continuous',s:'Writing',l:'A2',due:'vence en 4 días',sc:null,q:[['Right now, I ___ a message to my teacher.',['write','am writing','writes','wrote'],1],['My brother ___ football on Saturdays.',['plays','is playing','play','playing'],0],['Look! It ___ outside.',['rains','rain','is raining','rained'],2]]},
+ {id:'t3',t:'Skimming & Scanning',s:'Reading',l:'B1',due:'vence en 2 días',sc:null,q:[['Skimming a text means reading it to find...',['every detail','the main idea quickly','grammar mistakes','new words only'],1],['Scanning is best when you need to...',['find a specific date or name','understand the tone','memorize the text','translate'],0]]},
+ {id:'t4',t:'Conditionals I',s:'Writing',l:'B1',due:'vence en 6 días',sc:67,q:[['If it rains, we ___ the session online.',['will move','would move','moved','move'],0]]},
+ {id:'t5',t:'Connectors for Contrast',s:'Writing',l:'B2',due:'vence en 5 días',sc:null,q:[['The results were positive; ___, the team wants more data.',['however','because','so','and'],0],['___ the traffic, we arrived on time.',['Despite','Because','Therefore','Moreover'],0]]}];
+const diag=[['Vocabulario',100,0],['Comprensión lectora',100,0],['Gramática',50,1],['Conectores',0,1]];
+const chats={'Sebastián Navarro':[['o','¿Vamos a repasar el test semanal antes del viernes?'],['m','Sí, ¿a las 18:00 te acomoda?'],['o','Perfecto, nos vemos en el grupo de estudio.']],'Victoria Roa':[['o','Subí mi resumen de vocabulario al grupo 📎']],'Eduardo Guzmán':[['o','¿Alguien revisó el email que escribí?']]};
+const online={'Sebastián Navarro':1,'Victoria Roa':0,'Eduardo Guzmán':1};
+const S={auth:false,tab:'home',sub:null,quiz:null,chat:'Sebastián Navarro',form:false};
+const tabs=[['home','Inicio'],['eval','Evaluaciones'],['groups','Grupos'],['chat','Comunidad'],['set','Ajustes']];
+const lv=()=>new Set(groups.filter(g=>mine.has(g.id)).map(g=>g.l));
+const myTests=()=>tests.filter(t=>lv().has(t.l));
+const bad=(x,c='')=>`<span class="badge ${c}">${x}</span>`;
+const gname=id=>groups.find(g=>g.id===id).n;
+function toast(m){$('#toast').innerHTML=`<div class="toast" role="status">${m}</div>`;setTimeout(()=>{$('#toast').innerHTML=''},1900)}
+function resp(r){return r==='yes'?bad('Asistiré','ok'):r==='no'?bad('No asistiré'):bad('Sin responder','g')}
+function login(){return `<div class="login"><div class="card"><div class="row c" style="justify-content:flex-start;margin-bottom:6px"><span class="logo">DU</span><h1 style="font-size:20px;margin:0">Grupo de Estudio Duoc UC</h1></div>
+ <p class="sub" style="margin:0 0 8px">Practica inglés con otros estudiantes de tu nivel.</p>
+ <label for="em">Correo institucional</label><input id="em" value="javiera.acuna@duocuc.cl"><label for="pw">Contraseña</label><input id="pw" type="password" value="duoc2024">
+ <div style="height:18px"></div><button class="btn full" data-act="login">Iniciar sesión</button>
+ <p class="m" style="text-align:center;margin:14px 0 0">Demostración: cualquier dato funciona.</p></div></div>`}
+function head(){return `<header><div class="brand"><span class="logo">DU</span>Grupo de Estudio Duoc UC</div>
+ <nav class="pills" aria-label="Principal">${tabs.map(t=>`<button class="${t[0]===S.tab?'on':''}" data-act="tab" data-id="${t[0]}">${t[1]}</button>`).join('')}</nav>
+ <div class="tools"><button class="ic" data-act="theme" aria-label="Cambiar tema">◐</button><button class="av" data-act="tab" data-id="set" style="background:#2E5B8A;cursor:pointer" aria-label="Ajustes">${ini(ME)}</button></div></header>`}
+function home(){
+ const pend=myTests().filter(t=>t.sc==null),up=meets.filter(m=>mine.has(m.g));
+ return `<h1>Hola, Javiera</h1><p class="sub">Esto es lo que viene en tus grupos de estudio.</p>
+ <div class="stats"><div class="card"><b>${mine.size}</b><span>Grupos</span></div><div class="card"><b>${pend.length}</b><span>Tests pendientes</span></div><div class="card"><b>B1</b><span>Tu nivel</span></div></div>
+ <div class="cols"><div><h2>Próximos encuentros</h2>${up.map(m=>`<div class="card" data-act="grp" data-id="${m.g}" style="cursor:pointer"><div class="row"><div class="t">${m.t}</div>${resp(m.r)}</div><div class="m">${gname(m.g)} · ${m.w} · ${m.loc}</div></div>`).join('')}
+ <h2>Tests semanales pendientes</h2>${pend.length?pend.map(t=>`<div class="card"><div class="row c"><div><div class="t">${t.t}</div>${bad(t.s)} ${bad(t.l)} <span class="m">${t.due}</span></div><button class="btn sm" data-act="quiz" data-id="${t.id}">Resolver</button></div></div>`).join(''):'<div class="card m">No tienes tests pendientes. Únete a otro grupo para ver más.</div>'}</div>
+ <div><h2>Tu diagnóstico</h2><div class="card hero"><div class="sub">Nivel asignado</div><div style="font-size:46px;font-weight:800;color:var(--gold);line-height:1.1">B1</div><div class="sub">67 puntos · 4 de 6 correctas</div></div>
+ <h2>Mis grupos</h2>${groups.filter(g=>mine.has(g.id)).map(g=>`<div class="card" data-act="grp" data-id="${g.id}" style="cursor:pointer;padding:14px"><div class="row c"><span class="t">${g.n}</span>${bad(g.l,'g')}</div></div>`).join('')}</div></div>`}
+function card(g){return `<div class="card" data-act="grp" data-id="${g.id}" style="cursor:pointer"><div class="row"><div class="t">${g.n}</div>${bad(g.l,'g')}</div><div class="m" style="margin:6px 0">${g.d}</div><div class="avs">${g.m.slice(0,4).map(n=>av(n,30)).join('')}<span class="m">${g.m.length} de 6</span></div></div>`}
+function groupsV(){
+ if(S.sub){const g=groups.find(x=>x.id===S.sub),ms=meets.filter(m=>m.g===g.id),inn=mine.has(g.id);
+  return `<button class="back" data-act="back">‹ Volver a grupos</button><div class="row c"><div><h1>${g.n}</h1><p class="sub" style="margin:0">${g.d}</p></div><div>${inn?`<button class="btn out" data-act="leave" data-id="${g.id}">Salir del grupo</button>`:`<button class="btn" data-act="join" data-id="${g.id}">Unirme al grupo</button>`}</div></div>
+  <div class="avs" style="margin:14px 0 6px">${bad('Nivel '+g.l)} ${bad(g.m.length+' de 6 integrantes')} ${bad('Código '+g.code,'g')}</div>
+  <div class="cols"><div><div class="row c"><h2>Encuentros</h2>${inn?`<button class="btn sm" data-act="meet" data-id="${g.id}">Proponer encuentro</button>`:''}</div>${ms.length?ms.map(m=>`<div class="card"><div class="t">${m.t}</div><div class="m">${m.w} · ${m.loc}</div>${inn?`<div class="avs"><button class="btn sm ${m.r==='yes'?'gold':'out'}" data-act="rsp" data-id="${m.id}" data-v="yes">Asistiré</button><button class="btn sm ${m.r==='no'?'gold':'out'}" data-act="rsp" data-id="${m.id}" data-v="no">No asistiré</button></div>`:''}</div>`).join(''):'<div class="card m">Aún no hay encuentros. Propón el primero.</div>'}</div>
+  <div><h2>Integrantes</h2><div class="card">${g.m.map(n=>`<div class="row c" style="justify-content:flex-start;margin-bottom:10px">${av(n)}<div class="t">${n}</div></div>`).join('')}</div></div></div>`}
+ const form=S.form?`<div class="card"><div class="t">Crear grupo de estudio</div><label for="gn">Nombre</label><input id="gn" placeholder="Ej: Listening Club"><label for="gd">Descripción</label><input id="gd" placeholder="¿Qué van a practicar?"><label for="gl">Nivel</label><select id="gl">${['A1','A2','B1','B2','C1','C2'].map(l=>`<option ${l==='B1'?'selected':''}>${l}</option>`).join('')}</select><div class="avs" style="margin-top:16px"><button class="btn" data-act="mk">Crear grupo</button><button class="btn out" data-act="nomk">Cancelar</button></div></div>`:'';
+ return `<div class="row c"><div><h1>Grupos de estudio</h1><p class="sub">Máximo 6 integrantes por grupo, ordenados por nivel.</p></div><button class="btn gold" data-act="form">Crear grupo</button></div>${form}
+ <div class="card"><div class="row c"><div style="flex:1"><label for="code" style="margin:0 0 4px">¿Tienes un código de invitación?</label><input id="code" placeholder="DUOC-1234"></div><button class="btn" data-act="code" style="margin-top:20px">Unirme</button></div></div>
+ <h2>Mis grupos</h2><div class="grid">${groups.filter(g=>mine.has(g.id)).map(card).join('')||'<div class="card m">Aún no estás en ningún grupo.</div>'}</div>
+ <h2>Explorar grupos</h2><div class="grid">${groups.filter(g=>!mine.has(g.id)).map(card).join('')||'<div class="card m">No hay más grupos por ahora.</div>'}</div>`}
+function evalV(){
+ const q=S.quiz;
+ if(q&&q.done){const c=q.t.q.filter((x,i)=>q.a[i]===x[2]).length,p=Math.round(c/q.t.q.length*100);return `<div style="max-width:560px;margin:0 auto"><h1>Resultado</h1><div class="card hero" style="text-align:center"><div class="sub">${q.t.t}</div><div style="font-size:60px;font-weight:800;color:var(--gold);line-height:1.2">${p}</div><div class="sub">${c} de ${q.t.q.length} respuestas correctas</div></div><button class="btn full" data-act="end">Volver a evaluaciones</button></div>`}
+ if(q){const x=q.t.q[q.i];return `<div style="max-width:640px;margin:0 auto"><button class="back" data-act="end">‹ Salir del test</button><div class="m">${q.t.t} · pregunta ${q.i+1} de ${q.t.q.length}</div><div class="bar" style="margin-top:8px"><i style="width:${q.i/q.t.q.length*100}%"></i></div><h2 style="margin-top:6px;font-size:22px">${x[0]}</h2>${x[1].map((o,i)=>`<button class="opt ${q.a[q.i]===i?'sel':''}" data-act="ans" data-i="${i}">${o}</button>`).join('')}</div>`}
+ return `<h1>Evaluaciones</h1><p class="sub">Solo ves los tests de los niveles de tus grupos.</p><div class="cols"><div><h2 style="margin-top:0">Tests semanales</h2>${myTests().map(t=>`<div class="card"><div class="row c"><div><div class="t">${t.t}</div>${bad(t.s)} ${bad(t.l)} <span class="m">${t.due}</span></div>${t.sc!=null?bad(t.sc+' %','ok'):`<button class="btn sm" data-act="quiz" data-id="${t.id}">Resolver</button>`}</div></div>`).join('')}</div>
+ <div><h2 style="margin-top:0">Evaluación diagnóstica</h2><div class="card hero"><div class="sub">Resultado general</div><div style="font-size:44px;font-weight:800;color:var(--gold);line-height:1.1">67</div><div class="sub">Nivel B1 · 4 de 6 correctas</div></div>
+ <div class="card">${diag.map(d=>`<div class="row"><span class="t">${d[0]}</span><span class="m">${d[1]} %</span></div><div class="bar ${d[2]?'w':''}"><i style="width:${d[1]}%"></i></div>`).join('')}<div class="m">Por reforzar: gramática y conectores.</div></div></div></div>`}
+function chatV(){
+ const n=S.chat;
+ return `<h1>Comunidad</h1><p class="sub">Conversa con quienes comparten tus grupos.</p><div class="split"><div class="list">${Object.keys(chats).map(k=>`<div class="card ${k===n?'on':''}" data-act="open" data-n="${k}"><div class="row c" style="justify-content:flex-start">${av(k)}<div style="min-width:0"><div class="t">${k} ${online[k]?'<span style="color:var(--ok)">●</span>':''}</div><div class="m" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${chats[k].at(-1)[1]}</div></div></div></div>`).join('')}</div>
+ <div class="card thread"><div class="row c" style="justify-content:flex-start;margin-bottom:12px">${av(n)}<div><div class="t">${n}</div><div class="m">${online[n]?'En línea':'Desconectado'}</div></div></div><div class="msgs">${chats[n].map(m=>`<div class="bub ${m[0]==='m'?'me':''}">${m[1]}</div>`).join('')}</div><div class="row c"><input id="msg" placeholder="Escribe un mensaje" aria-label="Mensaje"><button class="btn" data-act="send">Enviar</button></div></div></div>`}
+function setV(){
+ return `<h1>Ajustes</h1><p class="sub">Tu cuenta y preferencias.</p><div class="grid">
+ <div class="card"><div class="row c" style="justify-content:flex-start">${av(ME,48)}<div><div class="t">${ME}</div><div class="m">Desarrollo de Software · Diurna</div></div></div><div class="avs">${bad('Nivel B1')} ${bad('javiera.acuna@duocuc.cl')}</div></div>
+ <div class="card"><div class="row c"><div><div class="t">Modo oscuro</div><div class="m">Cambia entre claro y oscuro.</div></div><button class="btn sm out" data-act="theme">Cambiar</button></div></div>
+ <div class="card"><div class="row c"><div><div class="t">Idioma</div><div class="m">Español o English.</div></div>${bad('Español')}</div></div>
+ <div class="card"><div class="row c"><div><div class="t">Sesión</div><div class="m">Salir de tu cuenta.</div></div><button class="btn sm out" data-act="out">Cerrar sesión</button></div></div></div>`}
+function render(){
+ if(!S.auth){$('#app').innerHTML=login();return}
+ const f={home,groups:groupsV,eval:evalV,chat:chatV,set:setV}[S.tab];
+ const y=scrollY;$('#app').innerHTML=head()+`<main>${f()}</main>`;scrollTo(0,y);
+}
+function flipTheme(){const r=document.documentElement,dk=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'}
+document.addEventListener('click',e=>{
+ const b=e.target.closest('[data-act]');if(!b)return;
+ const a=b.dataset.act,id=b.dataset.id;
+ if(a==='login')S.auth=true;
+ else if(a==='out'){S.auth=false;S.tab='home'}
+ else if(a==='tab'){S.tab=id;S.sub=null;S.quiz=null;scrollTo(0,0)}
+ else if(a==='grp'){S.tab='groups';S.sub=id;scrollTo(0,0)}
+ else if(a==='back')S.sub=null;
+ else if(a==='join'){mine.add(id);toast('Te uniste al grupo')}
+ else if(a==='leave'){mine.delete(id);S.sub=null;toast('Saliste del grupo')}
+ else if(a==='form')S.form=true;
+ else if(a==='nomk')S.form=false;
+ else if(a==='mk'){const n=$('#gn').value.trim();if(!n)return toast('Ingresa un nombre para el grupo');
+  const g={id:'n'+Date.now(),n,l:$('#gl').value,d:$('#gd').value.trim(),m:[ME],code:'DUOC-'+Math.floor(1000+Math.random()*9000)};
+  groups.unshift(g);mine.add(g.id);S.form=false;S.sub=g.id;toast('Grupo creado')}
+ else if(a==='code'){const v=($('#code').value||'').trim().toUpperCase(),g=groups.find(x=>x.code===v);
+  if(!g)return toast('No existe un grupo con ese código');
+  if(mine.has(g.id))return toast('Ya perteneces a este grupo');
+  mine.add(g.id);toast('Te uniste a '+g.n)}
+ else if(a==='rsp'){meets.find(m=>m.id===id).r=b.dataset.v;toast('Asistencia actualizada')}
+ else if(a==='meet'){meets.push({id:'n'+Date.now(),g:id,t:'Sesión de estudio propuesta',w:'Por definir',loc:'Por definir',r:'yes'});toast('Encuentro propuesto')}
+ else if(a==='quiz'){S.tab='eval';S.quiz={t:tests.find(t=>t.id===id),i:0,a:[],done:false};scrollTo(0,0)}
+ else if(a==='ans'){const q=S.quiz;q.a[q.i]=+b.dataset.i;render();setTimeout(()=>{if(q.i<q.t.q.length-1)q.i++;else{q.done=true;q.t.sc=Math.round(q.t.q.filter((x,i)=>q.a[i]===x[2]).length/q.t.q.length*100)}render()},350);return}
+ else if(a==='end')S.quiz=null;
+ else if(a==='open')S.chat=b.dataset.n;
+ else if(a==='send'){const i=$('#msg'),v=i.value.trim(),n=S.chat;if(!v)return;chats[n].push(['m',v]);render();
+  setTimeout(()=>{chats[n].push(['o','¡Genial, nos vemos ahí! 👍']);if(S.chat===n&&S.tab==='chat')render()},900);return}
+ else if(a==='theme'){flipTheme();return}
+ render();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){const t=e.target;if(t.id==='msg')document.querySelector('[data-act="send"]').click();if(t.id==='pw'||t.id==='em')document.querySelector('[data-act="login"]').click()}});
+render();
+</script>
+</body>
+</html>
