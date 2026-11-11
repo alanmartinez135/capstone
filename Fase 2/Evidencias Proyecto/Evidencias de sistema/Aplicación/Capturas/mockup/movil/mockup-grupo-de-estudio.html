@@ -52,8 +52,6 @@ h2{font-size:22px;margin:0 0 2px}h3{font-size:16px;margin:20px 0 10px}
 input{width:100%;padding:10px 12px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit}
 .opt{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px;border-radius:12px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);font:inherit;cursor:pointer}
 .opt.sel{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
-.bub{max-width:80%;padding:8px 12px;border-radius:16px;margin-bottom:8px;background:var(--card);border:1px solid var(--line)}
-.bub.me{margin-left:auto;background:var(--navy);color:#fff;border-color:var(--navy)}
 .back{background:none;border:0;color:var(--mut);font:600 14px inherit;cursor:pointer;padding:0 0 10px}
 .tog{display:flex;justify-content:space-between;align-items:center}
 .toast{position:absolute;left:50%;bottom:78px;transform:translateX(-50%);background:var(--navy);color:#fff;padding:9px 16px;border-radius:99px;font-size:13px;box-shadow:0 6px 20px rgba(0,0,0,.3);pointer-events:none}
@@ -80,9 +78,9 @@ const groups=[
  {id:'g5',n:'Tech English Crew',l:'B1',d:'Inglés técnico para TI: documentación y entrevistas.',m:['Matías Soto','Eduardo Guzmán'],code:'DUOC-9057'}];
 const mine=new Set(['g1','g2','g3']);
 const meets=[
- {id:'m1',g:'g1',t:'Repaso Skimming & Scanning antes del test',w:'Mañana · 18:00',loc:'Biblioteca, Sede Maipú – Sala 2',r:null},
+ {id:'m1',g:'g1',t:'Repaso Skimming & Scanning antes del test',w:'Mañana · 18:00',loc:'Biblioteca, Sede San Joaquín – Sala 2',r:null},
  {id:'m2',g:'g2',t:'Peer review: emails formales en inglés',w:'Jueves · 19:30',loc:'Online · Google Meet',r:null},
- {id:'m3',g:'g3',t:'Role-play: pedir comida y direcciones',w:'Sábado · 17:00',loc:'Sala 204, Sede Maipú',r:'yes'},
+ {id:'m3',g:'g3',t:'Role-play: pedir comida y direcciones',w:'Sábado · 17:00',loc:'Sala 204, Sede San Joaquín',r:'yes'},
  {id:'m4',g:'g1',t:'Simulacro de Academic Reading',w:'Próx. semana · 18:30',loc:'Online · Zoom',r:'yes'},
  {id:'m5',g:'g4',t:'Debate: AI in education',w:'Viernes · 18:00',loc:'Online · Zoom',r:null}];
 const tests=[
@@ -92,10 +90,8 @@ const tests=[
  {id:'t4',t:'Conditionals I',s:'Writing',l:'B1',due:'en 6 días',sc:67,q:[['If it rains, we ___ the session online.',['will move','would move','moved','move'],0]]},
  {id:'t5',t:'Connectors for Contrast',s:'Writing',l:'B2',due:'en 5 días',sc:null,q:[['The results were positive; ___, the team wants more data.',['however','because','so','and'],0],['___ the traffic, we arrived on time.',['Despite','Because','Therefore','Moreover'],0]]}];
 const diag=[['Vocabulario',100,0],['Comprensión lectora',100,0],['Gramática',50,1],['Conectores',0,1]];
-const chats={'Sebastián Navarro':[['o','¿Vamos a repasar el test semanal antes del viernes?'],['m','Sí, ¿a las 18:00 te acomoda?'],['o','Perfecto, nos vemos en el grupo de estudio.']],'Victoria Roa':[['o','Subí mi resumen de vocabulario al grupo 📎']],'Eduardo Guzmán':[['o','¿Alguien revisó el email que escribí?']]};
-const online={'Sebastián Navarro':1,'Victoria Roa':0,'Eduardo Guzmán':1};
-const S={tab:'home',sub:null,quiz:null,chat:null,dark:null,toast:''};
-const tabs=[['home','⌂','Inicio'],['groups','👥','Grupos'],['eval','✎','Evaluaciones'],['chat','💬','Comunidad'],['set','⚙','Ajustes']];
+const S={tab:'home',sub:null,quiz:null,dark:null,toast:''};
+const tabs=[['home','⌂','Inicio'],['groups','👥','Grupos'],['eval','✎','Evaluaciones'],['set','⚙','Ajustes']];
 const lv=()=>new Set(groups.filter(g=>mine.has(g.id)).map(g=>g.l));
 const myTests=()=>tests.filter(t=>lv().has(t.l));
 const bad=(x,c='')=>`<span class="badge ${c}">${x}</span>`;
@@ -126,9 +122,6 @@ function evalV(){
  <div class="card hero"><div class="t">Evaluación diagnóstica</div><div style="font-size:40px;font-weight:800;color:var(--gold);line-height:1.1">67 <span style="font-size:16px;color:#fff">· Nivel B1</span></div><div class="sub" style="margin:0">4 de 6 correctas</div></div>
  <div class="card">${diag.map(d=>`<div class="row"><span class="t">${d[0]}</span><span class="m">${d[1]}%</span></div><div class="bar ${d[2]?'w':''}"><i style="width:${d[1]}%"></i></div>`).join('')}<div class="m">Por reforzar: gramática y conectores.</div></div>
  <h3>Tests semanales</h3>${myTests().map(t=>`<div class="card"><div class="row"><div><div class="t">${t.t}</div>${bad(t.s)} ${bad(t.l)} <span class="m">${t.due}</span></div>${t.sc!=null?bad(t.sc+' %','ok'):`<button class="btn sm" data-act="quiz" data-id="${t.id}">Resolver</button>`}</div></div>`).join('')}`}
-function chatV(){
- if(S.chat){const n=S.chat;return `<button class="back" data-act="back">‹ Comunidad</button><h2>${n}</h2><p class="sub">${online[n]?'En línea':'Desconectado'}</p>${chats[n].map(m=>`<div class="bub ${m[0]==='m'?'me':''}">${m[1]}</div>`).join('')}<div class="row" style="align-items:center;margin-top:10px"><input id="msg" placeholder="Escribe un mensaje" aria-label="Mensaje"><button class="btn" data-act="send">Enviar</button></div>`}
- return `<h2>Comunidad</h2><p class="sub">Conversa con quienes comparten tus grupos.</p>${Object.keys(chats).map(n=>{const l=chats[n].at(-1);return `<div class="card" data-act="open" data-n="${n}" style="cursor:pointer"><div class="row" style="align-items:center">${av(n)}<div style="flex:1"><div class="t">${n} ${online[n]?'<span style="color:var(--ok)">●</span>':''}</div><div class="m">${l[1]}</div></div></div></div>`}).join('')}`}
 function setV(){
  return `<h2>Ajustes</h2><p class="sub">Tu cuenta y preferencias.</p>
  <div class="card"><div class="row" style="align-items:center">${av(ME)}<div><div class="t">${ME}</div><div class="m">Desarrollo de Software · Diurna</div></div></div><div class="avs">${bad('Nivel B1')} ${bad('javiera.acuna@duocuc.cl')}</div></div>
@@ -136,7 +129,7 @@ function setV(){
  <div class="card tog"><span class="t">Idioma</span>${bad('Español')}</div>
  <button class="btn out full" data-act="out">Cerrar sesión</button>`}
 function render(){
- const f={home,groups:groupsV,eval:evalV,chat:chatV,set:setV}[S.tab];
+ const f={home,groups:groupsV,eval:evalV,set:setV}[S.tab];
  $('#v').innerHTML=f();
  $('#ttl').textContent=tabs.find(t=>t[0]===S.tab)[2];
  $('#nav').innerHTML=tabs.map(t=>`<button class="${t[0]===S.tab?'on':''}" data-act="tab" data-id="${t[0]}"><i>${t[1]}</i>${t[2]}</button>`).join('');
@@ -149,9 +142,9 @@ document.addEventListener('click',e=>{
  const b=e.target.closest('[data-act]');
  if(!b){return}
  const a=b.dataset.act,id=b.dataset.id;
- if(a==='tab'){S.tab=id;S.sub=null;S.quiz=null;S.chat=null}
+ if(a==='tab'){S.tab=id;S.sub=null;S.quiz=null}
  else if(a==='grp'){S.tab='groups';S.sub=id}
- else if(a==='back'){S.sub=null;S.chat=null}
+ else if(a==='back'){S.sub=null}
  else if(a==='join'){mine.add(id);toast('Te uniste al grupo')}
  else if(a==='leave'){mine.delete(id);S.sub=null;toast('Saliste del grupo')}
  else if(a==='code'){const v=($('#code').value||'').trim().toUpperCase(),g=groups.find(x=>x.code===v);
@@ -163,9 +156,6 @@ document.addEventListener('click',e=>{
  else if(a==='quiz'){S.tab='eval';S.quiz={t:tests.find(t=>t.id===id),i:0,a:[],done:false}}
  else if(a==='ans'){const q=S.quiz;q.a[q.i]=+b.dataset.i;render();setTimeout(()=>{if(q.i<q.t.q.length-1)q.i++;else{q.done=true;q.t.sc=Math.round(q.t.q.filter((x,i)=>q.a[i]===x[2]).length/q.t.q.length*100)}render()},350);return}
  else if(a==='end'){S.quiz=null}
- else if(a==='open'){S.chat=b.dataset.n}
- else if(a==='send'){const i=$('#msg'),v=i.value.trim(),n=S.chat;if(!v)return;chats[n].push(['m',v]);render();
-  setTimeout(()=>{chats[n].push(['o','¡Genial, nos vemos ahí! 👍']);if(S.chat===n)render()},900);return}
  else if(a==='theme'){flipTheme();return}
  else if(a==='out'){toast('Sesión cerrada (demostración)');return}
  render();

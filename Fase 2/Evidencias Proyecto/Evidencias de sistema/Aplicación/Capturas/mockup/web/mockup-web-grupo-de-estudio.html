@@ -29,13 +29,7 @@ h1{font-size:28px;margin:0 0 4px}h2{font-size:18px;margin:26px 0 12px}
 .stats{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:8px}.stats .card{margin:0}
 .stats b{display:block;font-size:34px;color:var(--acc);line-height:1.1}.stats span{color:var(--mut);font-size:13px}
 .cols{display:grid;grid-template-columns:1.6fr 1fr;gap:28px;align-items:start}
-.split{display:grid;grid-template-columns:300px 1fr;gap:16px;min-height:480px}
-.split .list .card{padding:12px;margin-bottom:8px;cursor:pointer}.split .list .card.on{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold)}
-.thread{display:flex;flex-direction:column;margin:0}
-.msgs{flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto;min-height:300px;margin-bottom:12px}
-.bub{max-width:70%;padding:9px 14px;border-radius:16px;background:var(--chip);color:var(--ink)}
-.bub.me{align-self:flex-end;background:var(--navy);color:#fff}
-@media(max-width:800px){.cols,.split{grid-template-columns:1fr}.stats{grid-template-columns:1fr}.bub{max-width:90%}}
+@media(max-width:800px){.cols{grid-template-columns:1fr}.stats{grid-template-columns:1fr}}
 .row{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.row>div{min-width:0}
 .c{align-items:center}
 .t{font-weight:600}.m{color:var(--mut);font-size:13px}
@@ -75,9 +69,9 @@ const groups=[
  {id:'g5',n:'Tech English Crew',l:'B1',d:'Inglés técnico para TI: documentación y entrevistas.',m:['Matías Soto','Eduardo Guzmán'],code:'DUOC-9057'}];
 const mine=new Set(['g1','g2','g3']);
 const meets=[
- {id:'m1',g:'g1',t:'Repaso Skimming & Scanning antes del test',w:'Mañana · 18:00',loc:'Biblioteca, Sede Maipú – Sala 2',r:null},
+ {id:'m1',g:'g1',t:'Repaso Skimming & Scanning antes del test',w:'Mañana · 18:00',loc:'Biblioteca, Sede San Joaquín – Sala 2',r:null},
  {id:'m2',g:'g2',t:'Peer review: emails formales en inglés',w:'Jueves · 19:30',loc:'Online · Google Meet',r:null},
- {id:'m3',g:'g3',t:'Role-play: pedir comida y direcciones',w:'Sábado · 17:00',loc:'Sala 204, Sede Maipú',r:'yes'},
+ {id:'m3',g:'g3',t:'Role-play: pedir comida y direcciones',w:'Sábado · 17:00',loc:'Sala 204, Sede San Joaquín',r:'yes'},
  {id:'m4',g:'g1',t:'Simulacro de Academic Reading',w:'Próxima semana · 18:30',loc:'Online · Zoom',r:'yes'},
  {id:'m5',g:'g4',t:'Debate: AI in education',w:'Viernes · 18:00',loc:'Online · Zoom',r:null}];
 const tests=[
@@ -87,10 +81,8 @@ const tests=[
  {id:'t4',t:'Conditionals I',s:'Writing',l:'B1',due:'vence en 6 días',sc:67,q:[['If it rains, we ___ the session online.',['will move','would move','moved','move'],0]]},
  {id:'t5',t:'Connectors for Contrast',s:'Writing',l:'B2',due:'vence en 5 días',sc:null,q:[['The results were positive; ___, the team wants more data.',['however','because','so','and'],0],['___ the traffic, we arrived on time.',['Despite','Because','Therefore','Moreover'],0]]}];
 const diag=[['Vocabulario',100,0],['Comprensión lectora',100,0],['Gramática',50,1],['Conectores',0,1]];
-const chats={'Sebastián Navarro':[['o','¿Vamos a repasar el test semanal antes del viernes?'],['m','Sí, ¿a las 18:00 te acomoda?'],['o','Perfecto, nos vemos en el grupo de estudio.']],'Victoria Roa':[['o','Subí mi resumen de vocabulario al grupo 📎']],'Eduardo Guzmán':[['o','¿Alguien revisó el email que escribí?']]};
-const online={'Sebastián Navarro':1,'Victoria Roa':0,'Eduardo Guzmán':1};
-const S={auth:false,tab:'home',sub:null,quiz:null,chat:'Sebastián Navarro',form:false};
-const tabs=[['home','Inicio'],['eval','Evaluaciones'],['groups','Grupos'],['chat','Comunidad'],['set','Ajustes']];
+const S={auth:false,tab:'home',sub:null,quiz:null,form:false};
+const tabs=[['home','Inicio'],['eval','Evaluaciones'],['groups','Grupos'],['set','Ajustes']];
 const lv=()=>new Set(groups.filter(g=>mine.has(g.id)).map(g=>g.l));
 const myTests=()=>tests.filter(t=>lv().has(t.l));
 const bad=(x,c='')=>`<span class="badge ${c}">${x}</span>`;
@@ -132,10 +124,6 @@ function evalV(){
  return `<h1>Evaluaciones</h1><p class="sub">Solo ves los tests de los niveles de tus grupos.</p><div class="cols"><div><h2 style="margin-top:0">Tests semanales</h2>${myTests().map(t=>`<div class="card"><div class="row c"><div><div class="t">${t.t}</div>${bad(t.s)} ${bad(t.l)} <span class="m">${t.due}</span></div>${t.sc!=null?bad(t.sc+' %','ok'):`<button class="btn sm" data-act="quiz" data-id="${t.id}">Resolver</button>`}</div></div>`).join('')}</div>
  <div><h2 style="margin-top:0">Evaluación diagnóstica</h2><div class="card hero"><div class="sub">Resultado general</div><div style="font-size:44px;font-weight:800;color:var(--gold);line-height:1.1">67</div><div class="sub">Nivel B1 · 4 de 6 correctas</div></div>
  <div class="card">${diag.map(d=>`<div class="row"><span class="t">${d[0]}</span><span class="m">${d[1]} %</span></div><div class="bar ${d[2]?'w':''}"><i style="width:${d[1]}%"></i></div>`).join('')}<div class="m">Por reforzar: gramática y conectores.</div></div></div></div>`}
-function chatV(){
- const n=S.chat;
- return `<h1>Comunidad</h1><p class="sub">Conversa con quienes comparten tus grupos.</p><div class="split"><div class="list">${Object.keys(chats).map(k=>`<div class="card ${k===n?'on':''}" data-act="open" data-n="${k}"><div class="row c" style="justify-content:flex-start">${av(k)}<div style="min-width:0"><div class="t">${k} ${online[k]?'<span style="color:var(--ok)">●</span>':''}</div><div class="m" style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${chats[k].at(-1)[1]}</div></div></div></div>`).join('')}</div>
- <div class="card thread"><div class="row c" style="justify-content:flex-start;margin-bottom:12px">${av(n)}<div><div class="t">${n}</div><div class="m">${online[n]?'En línea':'Desconectado'}</div></div></div><div class="msgs">${chats[n].map(m=>`<div class="bub ${m[0]==='m'?'me':''}">${m[1]}</div>`).join('')}</div><div class="row c"><input id="msg" placeholder="Escribe un mensaje" aria-label="Mensaje"><button class="btn" data-act="send">Enviar</button></div></div></div>`}
 function setV(){
  return `<h1>Ajustes</h1><p class="sub">Tu cuenta y preferencias.</p><div class="grid">
  <div class="card"><div class="row c" style="justify-content:flex-start">${av(ME,48)}<div><div class="t">${ME}</div><div class="m">Desarrollo de Software · Diurna</div></div></div><div class="avs">${bad('Nivel B1')} ${bad('javiera.acuna@duocuc.cl')}</div></div>
@@ -144,7 +132,7 @@ function setV(){
  <div class="card"><div class="row c"><div><div class="t">Sesión</div><div class="m">Salir de tu cuenta.</div></div><button class="btn sm out" data-act="out">Cerrar sesión</button></div></div></div>`}
 function render(){
  if(!S.auth){$('#app').innerHTML=login();return}
- const f={home,groups:groupsV,eval:evalV,chat:chatV,set:setV}[S.tab];
+ const f={home,groups:groupsV,eval:evalV,set:setV}[S.tab];
  const y=scrollY;$('#app').innerHTML=head()+`<main>${f()}</main>`;scrollTo(0,y);
 }
 function flipTheme(){const r=document.documentElement,dk=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;r.dataset.theme=dk?'light':'dark'}
@@ -172,13 +160,10 @@ document.addEventListener('click',e=>{
  else if(a==='quiz'){S.tab='eval';S.quiz={t:tests.find(t=>t.id===id),i:0,a:[],done:false};scrollTo(0,0)}
  else if(a==='ans'){const q=S.quiz;q.a[q.i]=+b.dataset.i;render();setTimeout(()=>{if(q.i<q.t.q.length-1)q.i++;else{q.done=true;q.t.sc=Math.round(q.t.q.filter((x,i)=>q.a[i]===x[2]).length/q.t.q.length*100)}render()},350);return}
  else if(a==='end')S.quiz=null;
- else if(a==='open')S.chat=b.dataset.n;
- else if(a==='send'){const i=$('#msg'),v=i.value.trim(),n=S.chat;if(!v)return;chats[n].push(['m',v]);render();
-  setTimeout(()=>{chats[n].push(['o','¡Genial, nos vemos ahí! 👍']);if(S.chat===n&&S.tab==='chat')render()},900);return}
  else if(a==='theme'){flipTheme();return}
  render();
 });
-document.addEventListener('keydown',e=>{if(e.key==='Enter'){const t=e.target;if(t.id==='msg')document.querySelector('[data-act="send"]').click();if(t.id==='pw'||t.id==='em')document.querySelector('[data-act="login"]').click()}});
+document.addEventListener('keydown',e=>{if(e.key==='Enter'){const t=e.target;if(t.id==='pw'||t.id==='em')document.querySelector('[data-act="login"]').click()}});
 render();
 </script>
 </body>
